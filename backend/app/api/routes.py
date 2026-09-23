@@ -6,6 +6,11 @@ from app.services.search_service import ScoredListing, SearchParams, SearchServi
 router = APIRouter(prefix="/api/listings", tags=["listings"])
 
 
+@router.get("/health")
+def health_check():
+    return {"status": "healthy"}
+
+
 @router.get("/search", response_model=SearchResponse)
 def search_listings(
     minPrice: float | None = Query(default=None),

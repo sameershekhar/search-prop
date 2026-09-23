@@ -26,6 +26,7 @@ class SearchResponse(BaseModel):
     pageSize: int
     totalResults: int
     totalPages: int
+    
 
 
 class ErrorResponse(BaseModel):

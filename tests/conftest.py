@@ -6,9 +6,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.dependencies import get_search_service
-from app.domain.mappers import listing_from_dict
-from app.domain.models import Listing
 from app.main import create_app
+from app.models import Listing, listing_from_dict
 from app.repositories.in_memory_repository import InMemoryListingRepository
 from app.services.scoring import BudgetRecencyScorer
 from app.services.search_service import SearchService

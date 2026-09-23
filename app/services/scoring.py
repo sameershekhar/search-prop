@@ -2,7 +2,7 @@ import math
 from abc import ABC, abstractmethod
 from datetime import date, datetime
 
-from app.domain.models import Listing
+from app.models import Listing
 
 
 class ScoringStrategy(ABC):

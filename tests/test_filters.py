@@ -1,4 +1,4 @@
-from app.domain.models import Listing
+from app.models import Listing
 from app.services.filters import (
     CityFilter,
     CompositeFilter,

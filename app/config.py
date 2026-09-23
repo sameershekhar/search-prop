@@ -6,7 +6,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 class Settings:
     """Runtime configuration, overridable via environment variables."""
-
     data_file_path: Path = Path(
         os.getenv("SEARCHPROP_DATA_FILE", str(BASE_DIR / "data" / "listings.json"))
     )

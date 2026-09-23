@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from app.domain.models import Listing
+from app.models import Listing
 from app.repositories.base import ListingRepository
 from app.services.exceptions import InvalidSearchParamsError
 from app.services.filters import (

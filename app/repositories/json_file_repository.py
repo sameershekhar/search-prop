@@ -1,8 +1,7 @@
 import json
 from pathlib import Path
 
-from app.domain.mappers import listing_from_dict
-from app.domain.models import Listing
+from app.models import Listing, listing_from_dict
 from app.repositories.base import ListingRepository
 
 

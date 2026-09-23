@@ -1,7 +1,7 @@
 import math
 from datetime import date
 
-from app.domain.models import Listing
+from app.models import Listing
 from app.services.scoring import BudgetRecencyScorer
 
 TODAY = date(2026, 9, 23)

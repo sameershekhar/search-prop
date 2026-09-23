@@ -4,9 +4,13 @@ A FastAPI-based REST service for searching and ranking property listings. Suppor
 
 ## Architecture
 
-The backend follows **layered architecture with strategy patterns** for extensibility (plan: add Postgres/RDS later with zero changes to business logic):
+The backend follows a **3-layer architecture with strategy patterns** for extensibility (plan: add Postgres/RDS later with zero changes to business logic):
 
-- **Domain** (`app/domain/`): Core `Listing` model and mapper utilities.
+```
+api  ->  services  ->  repositories
+```
+
+- **`app/models.py`**: The `Listing` value object and its JSON mapper, shared across all three layers - not a layer itself, just the common data shape everyone passes around.
 - **Repositories** (`app/repositories/`): Persistence abstraction. Today: `JsonFileListingRepository` (file-based, in-memory cache). Tomorrow: `PostgresListingRepository` (AWS RDS).
 - **Services** (`app/services/`): Business logic.
   - **Filters** (strategy pattern): One filter class per dimension (`PriceRangeFilter`, `MinBedroomsFilter`, `CityFilter`, `KeywordFilter`). Composed via `CompositeFilter`.

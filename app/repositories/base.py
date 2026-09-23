@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from app.domain.models import Listing
+from app.models import Listing
 
 
 class ListingRepository(ABC):

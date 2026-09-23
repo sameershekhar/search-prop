@@ -14,6 +14,9 @@ env:
   BACKEND_REPOSITORY: searchprop-backend
   FRONTEND_REPOSITORY: searchprop-frontend
 
+  # Public backend URL used by the React/Vite frontend
+  VITE_API_BASE_URL: https://se-1f52a34cb4124c629a4aa7193d2377d6.ecs.ap-south-1.on.aws
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -49,6 +52,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build \
+            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }} \
             -t $ECR_REGISTRY/$FRONTEND_REPOSITORY:${{ github.sha }} \
             -t $ECR_REGISTRY/$FRONTEND_REPOSITORY:latest \
             ./frontend

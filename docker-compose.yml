@@ -17,6 +17,6 @@ services:
     ports:
       - "5173:5173"
     environment:
-      VITE_API_BASE_URL: http://localhost:8000 # update with backend url
+      VITE_API_BASE_URL: https://se-1f52a34cb4124c629a4aa7193d2377d6.ecs.ap-south-1.on.aws # update with backend url
     depends_on:
       - backend

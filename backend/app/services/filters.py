@@ -1,3 +1,4 @@
+import re
 from abc import ABC, abstractmethod
 
 from app.models import Listing
@@ -61,6 +62,68 @@ class KeywordFilter(ListingFilter):
         if not self._keyword:
             return True
         return self._keyword in listing.description.lower()
+
+
+class DuplicateAddressFilter(ListingFilter):
+    """Keeps only the first listing seen for each normalized address.
+
+    Different feeds format the same address inconsistently (e.g. "St" vs
+    "Street", "Apt" vs "Apartment"), so raw string equality would miss
+    duplicates. Addresses are normalized (case, punctuation, common street/
+    unit abbreviations) before comparing.
+
+    Unlike the other filters, this one is stateful and order-dependent: it
+    must be evaluated once per listing, in order, to build up the set of
+    addresses already seen (this is how CompositeFilter.apply already
+    iterates, so no other change is required).
+    """
+
+    _TOKEN_ALIASES: dict[str, str] = {
+        "street": "st", "str": "st",
+        "avenue": "ave", "av": "ave",
+        "boulevard": "blvd",
+        "drive": "dr", "drv": "dr",
+        "court": "ct",
+        "lane": "ln",
+        "road": "rd",
+        "place": "pl",
+        "square": "sq",
+        "terrace": "ter",
+        "circle": "cir", "cir": "cir",
+        "highway": "hwy",
+        "parkway": "pkwy",
+        "trail": "trl",
+        "apartment": "apt",
+        "unit": "apt",
+        "suite": "apt",
+        "ste": "apt",
+        "building": "bldg",
+        "north": "n",
+        "south": "s",
+        "east": "e",
+        "west": "w",
+        "northeast": "ne",
+        "northwest": "nw",
+        "southeast": "se",
+        "southwest": "sw",
+    }
+
+    def __init__(self):
+        self._seen_addresses: set[str] = set()
+
+    def matches(self, listing: Listing) -> bool:
+        normalized = self._normalize(listing.address)
+        if normalized in self._seen_addresses:
+            return False
+        self._seen_addresses.add(normalized)
+        return True
+
+    @classmethod
+    def _normalize(cls, address: str) -> str:
+        cleaned = re.sub(r"[^\w\s]", " ", address.lower())
+        tokens = cleaned.split()
+        canonical_tokens = [cls._TOKEN_ALIASES.get(token, token) for token in tokens]
+        return " ".join(canonical_tokens)
 
 
 class CompositeFilter(ListingFilter):

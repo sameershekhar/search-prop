@@ -5,6 +5,7 @@ from app.services.exceptions import InvalidSearchParamsError
 from app.services.filters import (
     CityFilter,
     CompositeFilter,
+    DuplicateAddressFilter,
     KeywordFilter,
     MinBedroomsFilter,
     PriceRangeFilter,
@@ -71,6 +72,10 @@ class SearchService:
                 MinBedroomsFilter(params.min_bedrooms),
                 CityFilter(params.city),
                 KeywordFilter(params.keyword),
+                # Always applied, independent of user-supplied params: feeds
+                # from multiple sources can list the same property twice
+                # with slightly different address formatting.
+                DuplicateAddressFilter(),
             ]
         )
 

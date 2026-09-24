@@ -2,6 +2,7 @@ from app.models import Listing
 from app.services.filters import (
     CityFilter,
     CompositeFilter,
+    DuplicateAddressFilter,
     KeywordFilter,
     MinBedroomsFilter,
     PriceRangeFilter,
@@ -95,6 +96,54 @@ class TestKeywordFilter:
 
     def test_none_is_no_op(self):
         assert KeywordFilter(None).matches(make_listing()) is True
+
+
+class TestDuplicateAddressFilter:
+    def test_first_occurrence_matches(self):
+        f = DuplicateAddressFilter()
+        assert f.matches(make_listing(address="1 Test St")) is True
+
+    def test_exact_repeat_excluded(self):
+        f = DuplicateAddressFilter()
+        f.matches(make_listing(address="1 Test St"))
+        assert f.matches(make_listing(address="1 Test St")) is False
+
+    def test_street_abbreviation_treated_as_duplicate(self):
+        f = DuplicateAddressFilter()
+        f.matches(make_listing(address="1 Test Street"))
+        assert f.matches(make_listing(address="1 Test St")) is False
+
+    def test_case_and_punctuation_insensitive(self):
+        f = DuplicateAddressFilter()
+        f.matches(make_listing(address="1 Test St."))
+        assert f.matches(make_listing(address="1 TEST st")) is False
+
+    def test_unit_abbreviation_treated_as_duplicate(self):
+        f = DuplicateAddressFilter()
+        f.matches(make_listing(address="1 Test St Apartment 4"))
+        assert f.matches(make_listing(address="1 Test St Apt 4")) is False
+
+    def test_apt_and_unit_treated_as_duplicate(self):
+        f = DuplicateAddressFilter()
+        f.matches(make_listing(address="123 Main St, Apt 4B"))
+        assert f.matches(make_listing(address="123 Main Street, Unit 4B")) is False
+
+    def test_different_addresses_both_match(self):
+        f = DuplicateAddressFilter()
+        assert f.matches(make_listing(address="1 Test St")) is True
+        assert f.matches(make_listing(address="2 Test St")) is True
+
+    def test_applied_through_composite_keeps_first_only(self):
+        composite = CompositeFilter([DuplicateAddressFilter()])
+        listings = [
+            make_listing(id="A", address="1 Test Street"),
+            make_listing(id="B", address="1 Test St"),
+            make_listing(id="C", address="2 Test St"),
+        ]
+
+        result = composite.apply(listings)
+
+        assert [l.id for l in result] == ["A", "C"]
 
 
 class TestCompositeFilter:
